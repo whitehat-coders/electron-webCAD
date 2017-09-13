@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>My WebGL App</title>
+    <script>
+        window.nodeRequire = require;
+        delete window.require;
+        delete window.exports;
+        delete window.module;
+    </script>
+      
+    <script type="text/javascript" src="gl-matrix.js"></script>
+    <script type="text/javascript" src="jquery-3.2.1.js"></script>
+    
+  </head>
+  <body>
+<!--
+      We are using Node.js <script>document.write(process.versions.node)</script>,
+    Chromium <script>document.write(process.versions.chrome)</script>,
+    and Electron <script>document.write(process.versions.electron)</script>
+-->
+    <button id="line" >LINE</button>
+        <button id="squarer">SHADE</button>
+        <button id="pointer">POINTS</button>
+        <button id="zoomout">ZOOMOUT</button>
+        <button id="zoomin">ZOOMIN</button>
+        <span id="xcord">X-cordinate:</span>
+        <span id="ycord">Y-cordinate:</span>
+        <canvas id="glCanvas" ></canvas>
+      
+      <script id="shader-fs" type="x-shader/x-fragment">
+            precision mediump float;
+            void main(void) {
+                gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+            }
+        </script>
+
+        <script id="shader-vs" type="x-shader/x-vertex">
+            attribute vec3 aVertexPosition;
+            uniform mat4 uMVMatrix;
+            uniform mat4 uPMatrix;
+            void main(void) {
+                gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+                gl_PointSize = 5.0;
+            }
+        </script>
+        
+        <script type="text/javascript" src="webglscript.js"></script>  
+        <script>
+            
+//        canvas.addEventListener( 'mousemove', onDocumentMouseMove, false );
+        /*function onDocumentMouseMove(event){
+                event.stopPropagation();
+                event.preventDefault();
+                trueYCord = ((1 - (event.offsetY / canvas.clientHeight)) * 2 - 1)*angle;
+                trueXCord = ((event.offsetX / canvas.clientWidth) * 2 - 1)*angle*aspect;
+                document.getElementById("xcord").innerText="X-cordinate: "+trueXCord;
+                document.getElementById("ycord").innerText="Y-cordinate: "+trueYCord;
+                initBuffersm(trueXCord,trueYCord);
+                drawScened();
+              
+        }*/
+        $(document).ready(function(){
+            var trueYCord;
+            var trueXCord;
+            var zee = 20;
+            var vangle = 90;
+            var vangl2 = vangle/2;
+            var vangle3 = vangl2* Math.PI / 180;
+            var angle = Math.tan(vangle3)*zee;
+            var aspect = (gl.viewportWidth / gl.viewportHeight);
+            console.log(aspect);
+            $('#glCanvas').css('cursor', 'crosshair');
+            $("#line").on('click', function(){
+                shape = gl.LINE_STRIP;
+                main();
+            })
+            $("#squarer").on('click', function(){
+                shape = gl.TRIANGLE_STRIP;
+                main();
+            })
+            
+            $("#pointer").on('click', function(){
+                shape = gl.POINTS;
+                main();
+            })
+            
+            $("#zoomout").on('click', function(){
+                z = z-1;
+                drawScene2(z);
+            })
+            
+             $("#zoomin").on('click', function(){
+                z = z+1;
+                drawScene2(z);
+            })
+            
+            $("#glCanvas").mousemove(function(event){
+                trueYCord = ((1 - (event.offsetY / canvas.clientHeight)) * 2 - 1)*angle;
+                trueXCord = ((event.offsetX / canvas.clientWidth) * 2 - 1)*angle*aspect;
+                $("#xcord").text("X-cordinate: "+trueXCord);
+                $("#ycord").text("Y-cordinate: "+trueYCord);
+                initBuffersm(trueXCord,trueYCord);
+                drawScened();
+                console.log('time');
+            })
+            
+            $("#glCanvas").on('click', function(){
+//                $("#xcord").text("X-cordinate: "+trueXCord);
+//                $("#ycord").text("Y-cordinate: "+trueYCord);
+                initBuffersd(trueXCord,trueYCord);
+                drawScened(trueXCord,trueYCord);
+            })
+            
+        })
+        </script>
+  </body>
+
+  <script>
+    // You can also require other files to run in this process
+    //require('./renderer.js')
+  </script>
+</html>
